@@ -1,16 +1,14 @@
 local cosmoUI = {activeItems = {}, menuData = nil}
 local CUIPresets = require(script.CUIPresets)
-local allowedTypes = {"ImageButton", "TextButton", "TextBox", "TextLabel", "ImageLabel", "Frame", "ScrollingFrame"}
 local defaultSettings = {Visible = false, scriptConnections = {}, settingsKeywords = {Visible = {"visibility", "view", "enabled", "visible"}}}
 local settingsWithKeywords = {"Visible"}
-function cosmoUI:registerItem(itemReceived: Instance, itemSettings: {Visible: boolean, scriptConnections: {}, settingsKeywords: {}})
-	assert(table.find(allowedTypes, itemReceived.ClassName), "This item is not supported ("..itemReceived.ClassName..").")
+function cosmoUI:registerItem(itemReceived: ImageButton | TextButton | TextBox | TextLabel | ImageLabel | Frame | ScrollingFrame, itemSettings: {Visible: boolean, scriptConnections: {}, settingsKeywords: {}})
 	assert(not cosmoUI.activeItems[itemReceived], "This item has already been registered, use getItem.")
 	for i,v in pairs(defaultSettings) do if not itemSettings[i] then itemSettings[i] = v end end
 	for i,v in pairs(itemSettings.scriptConnections) do
 		local success, res = pcall(function() return itemReceived[i]:Connect(v) end)
 		if success then itemSettings.scriptConnections[i] = res else warn("An error has occured, make sure this is a valid connection.") end
-	end
+	end	
 	local rawMetaSettings = {instance = itemReceived, iConnections = itemSettings.scriptConnections}
 	
 	local metaSettings = setmetatable(rawMetaSettings, {
